@@ -26,8 +26,8 @@ public class Honcho {
         executor.addProvider(type, provider);
     }
 
-    public void execute(CommandActor actor, String command) {
-        //executor.execute(actor, command);
+    public void execute(CommandActor actor, String command, String arguments) {
+        executor.execute(actor, registry.get(command), arguments);
     }
 
     public static class Builder {

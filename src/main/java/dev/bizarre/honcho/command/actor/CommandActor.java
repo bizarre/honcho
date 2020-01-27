@@ -4,5 +4,6 @@ public interface CommandActor<T> {
 
     void message(String message);
     boolean hasPermission(String permission);
+    T to();
 
 }
