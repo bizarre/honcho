@@ -1,7 +1,9 @@
 package dev.bizarre.honcho;
 
+import dev.bizarre.honcho.command.actor.CommandActor;
 import dev.bizarre.honcho.command.executor.CommandExecutor;
 import dev.bizarre.honcho.command.executor.impl.DefaultCommandExecutor;
+import dev.bizarre.honcho.command.provider.CommandProvider;
 import dev.bizarre.honcho.command.registry.CommandRegistry;
 import dev.bizarre.honcho.command.registry.impl.DefaultCommandRegistry;
 import dev.bizarre.honcho.feature.Feature;
@@ -16,8 +18,16 @@ public class Honcho {
         this.executor = builder.executor;
     }
 
-    public void register(Class command) {
+    public void register(Object command) {
+        registry.register(command);
+    }
 
+    public void register(Class type, CommandProvider provider) {
+        executor.addProvider(type, provider);
+    }
+
+    public void execute(CommandActor actor, String command) {
+        //executor.execute(actor, command);
     }
 
     public static class Builder {

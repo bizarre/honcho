@@ -6,6 +6,9 @@ import dev.bizarre.honcho.command.registry.CommandRegistry;
 
 import java.util.Set;
 
+/**
+ * This interface
+ */
 public interface Feature {
 
     CommandExecutor getExecutor();
