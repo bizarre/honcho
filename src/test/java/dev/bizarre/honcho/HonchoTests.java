@@ -3,6 +3,7 @@ package dev.bizarre.honcho;
 import dev.bizarre.honcho.command.CommandMeta;
 import dev.bizarre.honcho.command.actor.impl.DefaultCommandActor;
 import dev.bizarre.honcho.command.example.ExampleCommand;
+import dev.bizarre.honcho.command.executor.impl.DefaultCommandExecutor;
 import dev.bizarre.honcho.command.provider.impl.StringCommandProvider;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class HonchoTests {
 
     @CommandMeta("test")
     public class TestCommand {
-        public void execute(String status) {
+        public void execute(DefaultCommandActor actor, String status) {
             testObject.bool = true;
             testObject.number = 1337;
             testObject.status = status;

@@ -8,7 +8,9 @@ import dev.bizarre.honcho.command.provider.CommandProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -23,8 +25,9 @@ public class DefaultCommandExecutor implements CommandExecutor {
     @Override
     public void execute(CommandActor actor, Command command, String arguments) {
         String[] args = arguments.split(" ");
-
         Method primary = null;
+
+        // iterate over methods and find closest one to arguments provided
         for (Method method : command.getMethods()) {
             if (primary == null) { primary = method; continue; }
 
@@ -35,14 +38,25 @@ public class DefaultCommandExecutor implements CommandExecutor {
 
         if (primary != null) {
             Parameter[] types = primary.getParameters();
-            Object[] parameters = new Object[primary.getParameterCount()];
+            List<Object> parameters = new ArrayList<>();
 
-            for (int i = 0; i < args.length; i++) {
-                parameters[i] = providers.get(types[i].getType()).provide(args[i]);
+            Object senderObj = actor.to();
+            Class sender = types[0].getType();
+
+            // actor representation is equal to first parameter of chosen method
+            if (senderObj != null && senderObj.getClass().equals(sender)) {
+                // add actor representation to parameters
+                parameters.add(senderObj);
+            }
+
+            int index = parameters.size();
+            for (String argument : args) {
+                // add provider-transmuted obj to parameters
+                parameters.add(providers.get(types[index].getType()).provide(argument));
             }
 
             try {
-                primary.invoke(command.getInstance(), parameters);
+                primary.invoke(command.getInstance(), parameters.toArray());
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

@@ -10,6 +10,6 @@ public class DefaultCommandActor implements CommandActor  {
     public boolean hasPermission(String permission) {
         return true;
     }
-    @Override public Object to() { return null; }
+    @Override public Object to() { return this; }
 
 }
