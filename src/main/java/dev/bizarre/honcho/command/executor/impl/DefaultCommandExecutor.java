@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class DefaultCommandExecutor implements CommandExecutor {
 
@@ -23,11 +22,12 @@ public class DefaultCommandExecutor implements CommandExecutor {
     }
 
     @Override
-    public void execute(CommandActor actor, Command command, String arguments) {
+    public boolean execute(CommandActor actor, Command command, String arguments) {
         String[] args = arguments.split(" ");
         Method primary = null;
 
         // iterate over methods and find closest one to arguments provided
+        // todo: fetch method better
         for (Method method : command.getMethods()) {
             if (primary == null) { primary = method; continue; }
 
@@ -43,25 +43,44 @@ public class DefaultCommandExecutor implements CommandExecutor {
             Object senderObj = actor.to();
             Class sender = types[0].getType();
 
-            // actor representation is equal to first parameter of chosen method
-            if (senderObj != null && senderObj.getClass().equals(sender)) {
+            // if actor representation is equal to (or subtype of) first parameter of chosen method
+            if (senderObj != null && sender.isAssignableFrom(senderObj.getClass())) {
                 // add actor representation to parameters
                 parameters.add(senderObj);
             }
 
             int index = parameters.size();
             for (String argument : args) {
+
+                if (index >= types.length) {
+
+                    if (types[types.length-1].getType() == String.class) {
+                        StringBuilder previous = new StringBuilder((String) parameters.get(parameters.size() - 1));
+                        for (int i = index-1; i < args.length; i++) {
+                            previous.append(" ").append(args[i]);
+                        }
+
+                        parameters.set(parameters.size()-1, previous.toString());
+                    }
+
+                    break;
+                }
+
                 // add provider-transmuted obj to parameters
                 parameters.add(providers.get(types[index].getType()).provide(argument));
+                index++;
             }
 
             try {
                 primary.invoke(command.getInstance(), parameters.toArray());
+                return true;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
 
+        // command failed to map
+        return false;
     }
 
 }

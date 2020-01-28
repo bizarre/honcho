@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class DefaultCommandRegistry implements CommandRegistry {
 
-    private Set<Command> commands = new HashSet<>();
+    protected Set<Command> commands = new HashSet<>();
 
     @Override
     public boolean register(Object command) {

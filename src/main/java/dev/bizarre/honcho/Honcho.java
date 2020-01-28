@@ -4,9 +4,13 @@ import dev.bizarre.honcho.command.actor.CommandActor;
 import dev.bizarre.honcho.command.executor.CommandExecutor;
 import dev.bizarre.honcho.command.executor.impl.DefaultCommandExecutor;
 import dev.bizarre.honcho.command.provider.CommandProvider;
+import dev.bizarre.honcho.command.provider.impl.StringCommandProvider;
 import dev.bizarre.honcho.command.registry.CommandRegistry;
 import dev.bizarre.honcho.command.registry.impl.DefaultCommandRegistry;
 import dev.bizarre.honcho.feature.Feature;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Honcho {
 
@@ -16,6 +20,8 @@ public class Honcho {
     private Honcho(Builder builder) {
         this.registry = builder.registry;
         this.executor = builder.executor;
+
+        builder.providers.forEach(this::register);
     }
 
     public void register(Object command) {
@@ -33,6 +39,11 @@ public class Honcho {
     public static class Builder {
         private CommandRegistry registry = new DefaultCommandRegistry();
         private CommandExecutor executor = new DefaultCommandExecutor();
+        private Map<Class, CommandProvider> providers = new HashMap<>();
+
+        public Builder() {
+            this.providers.put(String.class, new StringCommandProvider());
+        }
 
         @Deprecated public Builder withRegistry(CommandRegistry registry) {
             this.registry = registry;
@@ -47,6 +58,7 @@ public class Honcho {
         public Builder withFeature(Feature feature) {
             this.registry = feature.getRegistry();
             this.executor = feature.getExecutor();
+            this.providers.putAll(feature.getDefaultProviders());
 
             return this;
         }

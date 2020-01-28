@@ -22,7 +22,7 @@ public class HonchoTests {
 
     @CommandMeta("test")
     public class TestCommand {
-        public void execute(DefaultCommandActor actor, String status) {
+        public void execute(String status) {
             testObject.bool = true;
             testObject.number = 1337;
             testObject.status = status;

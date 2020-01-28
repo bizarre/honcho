@@ -11,5 +11,4 @@ public @interface CommandMeta {
 
     String[] value();
 
-
 }
