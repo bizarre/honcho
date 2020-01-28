@@ -37,5 +37,34 @@ public class InfoCommand {
   }
 
 }
+```
 
+## custom actors
+You can implement the `CommandActor` interface to allow using your own custom objects in command functions.
+
+```java
+@AllArgsConstructor
+public class PlayerCommandActor implements CommandActor<Player> {
+
+    private Player player;
+
+    ...
+
+    @Override
+    public Player to() {
+        return player;
+    }
+
+}
+
+// now you can use the Player type as a command actor (assuming your CommandExecutor) supports it.
+
+@CommandMeta("broadcast", "bc")
+public class BroadcastCommand {
+
+  public void execute(Player player, String message) {
+    Bukkit.broadcastMessage(player.getDisplayName() + " says: " + message);
+  }
+
+}
 ```
